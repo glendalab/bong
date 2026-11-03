@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>{{ .Title }}</ShortName>
+  <Description>Search shortcut redirector</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image width="16" height="16" type="image/svg+xml">{{ .BaseURL }}/icon.svg</Image>
+  <Url rel="results" type="text/html" method="get" template="{{ .BaseURL }}/s?q={searchTerms}"/>
+  <Url rel="suggestions" type="application/x-suggestions+json" method="get" template="{{ .BaseURL }}/suggest?q={searchTerms}"/>
+  <Url type="application/opensearchdescription+xml" rel="self" template="{{ .BaseURL }}/opensearch.xml"/>
+</OpenSearchDescription>

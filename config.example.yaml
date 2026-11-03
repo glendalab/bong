@@ -1,0 +1,129 @@
+title: Bong
+listen: ":8080"
+prefix: "."
+default: g
+# Set base_url behind a reverse proxy. X-Forwarded-* headers are ignored.
+# base_url: "https://bong.example.org"
+# Queries without a shortcut get suggestions only from a top-level suggest_url.
+# suggest_url: "https://suggestqueries.google.com/complete/search?client=firefox&ie=utf-8&oe=utf-8&q=%s"
+# Paths are relative to the including file. Included files take only include and bongs.
+# An included entry without search_url is an overlay, used only if some file defines that bong.
+# A file overrides its includes, and later includes override earlier ones.
+# Changing an existing search_url clears any main_url, post* and suggest_* from earlier includes.
+# include:
+#   - "kr.yaml"
+
+bongs:
+  # Search
+  g:
+    title: Google
+    search_url: "https://www.google.com/search?q=%s"
+    suggest_url: "https://suggestqueries.google.com/complete/search?client=firefox&ie=utf-8&oe=utf-8&q=%s"
+  ddg:
+    title: DuckDuckGo
+    search_url: "https://duckduckgo.com/?q=%s"
+    suggest_url: "https://duckduckgo.com/ac/?q=%s&type=list"
+
+  # AI
+  gem:
+    title: Gemini
+    main_url: "https://gemini.google.com"
+    search_url: "https://www.google.com/search?udm=50&q=%s"
+  dai:
+    title: Duck.ai
+    search_url: "https://duck.ai/chat?q=%s&prompt=1&bang=true"
+  gpt:
+    title: ChatGPT
+    search_url: "https://chatgpt.com/?q=%s"
+  cl:
+    title: Claude
+    search_url: "https://claude.ai/new?q=%s"
+  ppx:
+    title: Perplexity
+    search_url: "https://www.perplexity.ai/search?q=%s"
+
+  # Reference
+  w:
+    title: Wikipedia
+    search_url: "https://en.wikipedia.org/w/index.php?search=%s"
+    suggest_url: "https://en.wikipedia.org/w/api.php?action=opensearch&search=%s"
+  wt:
+    title: Wiktionary
+    search_url: "https://en.wiktionary.org/w/index.php?search=%s"
+    suggest_url: "https://en.wiktionary.org/w/api.php?action=opensearch&search=%s"
+  aw:
+    title: ArchWiki
+    search_url: "https://wiki.archlinux.org/index.php?search=%s"
+    suggest_url: "https://wiki.archlinux.org/api.php?action=opensearch&search=%s"
+  wa:
+    title: WolframAlpha
+    search_url: "https://www.wolframalpha.com/input?i=%s"
+    suggest_url: "https://www.wolframalpha.com/n/v1/api/autocomplete/?i=%s"
+    suggest_path: "results.input"
+  wb:
+    title: Wayback Machine
+    search_url: "https://web.archive.org/web/*/%s"
+
+  # Dev
+  gh:
+    title: GitHub
+    search_url: "https://github.com/search?q=%s"
+    suggest_url: "https://api.github.com/search/repositories?q=%s&per_page=8"
+    suggest_path: "items.full_name"
+  go:
+    title: Go Packages
+    search_url: "https://pkg.go.dev/search?q=%s"
+  cr:
+    title: crates.io
+    search_url: "https://crates.io/search?q=%s"
+    suggest_url: "https://crates.io/api/v1/crates?q=%s&per_page=8"
+    suggest_path: "crates.name"
+  npm:
+    search_url: "https://www.npmjs.com/search?q=%s"
+    suggest_url: "https://api.npms.io/v2/search/suggestions?q=%s&size=8"
+    suggest_path: "package.name"
+  pypi:
+    title: PyPI
+    search_url: "https://pypi.org/search/?q=%s"
+  mdn:
+    title: MDN Web Docs
+    search_url: "https://developer.mozilla.org/en-US/search?q=%s"
+    suggest_url: "https://developer.mozilla.org/api/v1/search/suggestions?q=%s&locale=en-US"
+  so:
+    title: Stack Overflow
+    search_url: "https://stackoverflow.com/search?q=%s"
+    suggest_url: "https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=relevance&q=%s&site=stackoverflow&pagesize=8"
+    suggest_path: "items.title"
+
+  # Media & Social
+  yt:
+    title: YouTube
+    search_url: "https://www.youtube.com/results?search_query=%s"
+    suggest_url: "https://suggestqueries.google.com/complete/search?client=firefox&ds=yt&ie=utf-8&oe=utf-8&q=%s"
+  r:
+    title: Reddit
+    search_url: "https://www.reddit.com/search/?q=%s"
+  sr:
+    title: Subreddit
+    search_url: "https://www.reddit.com/r/%s"
+  hn:
+    title: Hacker News
+    main_url: "https://news.ycombinator.com"
+    search_url: "https://hn.algolia.com/?q=%s"
+    suggest_url: "https://hn.algolia.com/api/v1/search?query=%s&hitsPerPage=8"
+    suggest_path: "hits.title"
+
+  # Tools
+  maps:
+    title: Google Maps
+    main_url: "https://www.google.com/maps"
+    search_url: "https://www.google.com/maps/search/%s"
+  tr:
+    title: Google Translate
+    search_url: "https://translate.google.com/?sl=auto&text=%s"
+  dl:
+    title: DeepL
+    main_url: "https://www.deepl.com/translator"
+    # {language}: the browser's preferred language, ko for ko-KR, en if none
+    # DeepL links reject an auto source. A hy (Armenian) source still auto-detects other languages.
+    search_url: "https://www.deepl.com/translator?sourceLanguage=hy&targetLanguage={language}&sourceText=%s"

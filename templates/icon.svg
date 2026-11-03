@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>Bong</title>
+  <rect x="40" y="40" width="432" height="432" rx="108" fill="#e8461c"/>
+  <g fill="none" stroke="#fff" stroke-linecap="round">
+    <circle cx="236" cy="286" r="75" stroke-width="54"/>
+    <path d="M292 342L365 415" stroke-width="58"/>
+    <path d="M136 126L182 198M240 105L248 185" stroke-width="64"/>
+  </g>
+</svg>

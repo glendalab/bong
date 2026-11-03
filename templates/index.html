@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="search" type="application/opensearchdescription+xml" title="{{ .Title }}" href="opensearch.xml">
+  <title>{{ .Title }}</title>
+  <style>
+    :root { color-scheme: light dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: clamp(4rem, 22dvh, 10rem) 1rem 2rem;
+    }
+    main {
+      width: 100%;
+      max-width: 34rem;
+    }
+    h1 {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0 0 1rem;
+    }
+    .logo {
+      width: 2.1rem;
+      height: 2.1rem;
+    }
+    form {
+      display: flex;
+      gap: 0.5rem;
+    }
+    input[type="search"], button {
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+      padding: 0.6rem 0.85rem;
+      font-family: inherit;
+      font-size: 1rem;
+      line-height: 1.25;
+      border: 1px solid color-mix(in srgb, CanvasText 25%, transparent);
+      border-radius: 6px;
+      background: Canvas;
+      color: CanvasText;
+    }
+    input[type="search"] {
+      flex: 1;
+      min-width: 0;
+      outline: none;
+    }
+    input[type="search"]:focus {
+      border-color: color-mix(in srgb, CanvasText 55%, transparent);
+    }
+    button { cursor: pointer; }
+    .notice {
+      margin-top: 0.75rem;
+      font-size: 0.875rem;
+      opacity: 0.75;
+      text-align: center;
+    }
+    details {
+      margin-top: 0.85rem;
+      font-size: 0.875rem;
+    }
+    summary {
+      cursor: pointer;
+      opacity: 0.6;
+      text-align: center;
+      user-select: none;
+      list-style: none;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary:hover { opacity: 1; }
+    .list {
+      margin-top: 0.75rem;
+      max-height: 55vh;
+      overflow-y: auto;
+      border: 1px solid color-mix(in srgb, CanvasText 15%, transparent);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+    }
+    .list[hidden] { display: none; }
+    #drawer .list { scroll-padding-block: 0.5rem; }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid color-mix(in srgb, CanvasText 10%, transparent);
+      cursor: pointer;
+    }
+    .row:last-child { border-bottom: none; }
+    .row:hover, .row.active { background: color-mix(in srgb, CanvasText 8%, transparent); }
+    .row[hidden] { display: none; }
+    .name {
+      min-width: 0;
+      white-space: nowrap;
+    }
+    #suggestions .name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #drawer .name {
+      display: flex;
+      align-items: baseline;
+      flex-grow: 1;
+    }
+    .host, .desc {
+      opacity: 0.5;
+      font-size: 0.8rem;
+      margin-left: 0.4rem;
+      text-decoration: none;
+      color: inherit;
+    }
+    .host:hover { opacity: 0.9; text-decoration: underline; }
+    .pick {
+      all: unset;
+      cursor: pointer;
+      flex: none;
+      max-width: calc(100% - 4em);
+    }
+    #drawer .name > * {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pick:focus-visible {
+      outline: 2px solid color-mix(in srgb, CanvasText 55%, transparent);
+      outline-offset: 2px;
+      border-radius: 3px;
+    }
+    .keys {
+      display: flex;
+      gap: 0.3rem;
+      flex-shrink: 0;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.8rem;
+      padding: 0.12rem 0.38rem;
+      border-radius: 4px;
+      background: color-mix(in srgb, CanvasText 10%, transparent);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1><img class="logo" src="icon.svg" alt="">{{ .Title }}</h1>
+    <form id="form" action="s" method="get">
+      <input id="q" type="search" name="q" value="{{ .Query }}" placeholder="Search with {{ .Prefix }}shortcut..." autocomplete="off"
+        aria-label="Search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions">
+      <button type="submit">Go</button>
+    </form>
+    <div id="suggestions" class="list" role="listbox" aria-label="Suggestions" hidden></div>
+    {{- if .Message }}
+    <p class="notice">{{ .Message }}</p>
+    {{- end }}
+
+    <details id="drawer">
+      <summary>{{ len .Items }} shortcuts</summary>
+      <div class="list">
+        {{- $prefix := .Prefix -}}
+        {{- range .Items }}
+        <div class="row" data-key="{{ .Key }}">
+          <span class="name">
+            <button type="button" class="pick" aria-describedby="keys-{{ .Key }}">{{ .Title }}</button>
+            <a class="host" href="{{ .MainURL }}">{{ .Host }}</a>
+          </span>
+          <span class="keys" id="keys-{{ .Key }}">
+            <code>{{ $prefix }}{{ .Key }}</code>
+            {{- range .Aliases }}
+            <code>{{ $prefix }}{{ . }}</code>
+            {{- end }}
+          </span>
+        </div>
+        {{- end }}
+      </div>
+    </details>
+  </main>
+
+  <script>
+    const prefix = {{ .Prefix }};
+    const prefixLower = prefix.toLowerCase();
+    const plainSuggest = {{ .PlainSuggest }};
+    const form = document.getElementById("form");
+    const q = document.getElementById("q");
+    const suggestionsEl = document.getElementById("suggestions");
+    const drawer = document.getElementById("drawer");
+    const rows = Array.from(drawer.querySelectorAll(".row"));
+
+    if (window.matchMedia("(pointer: fine)").matches) {
+      q.focus();
+    }
+
+    let autoOpened = false;
+    let abortCtrl = null;
+    let debounceTimer = null;
+    let pendingFilter = null;
+    let rowsToken = prefixLower;
+    let activeIdx = -1;
+    let savedQuery = "";
+
+    function isShortcutToken(val) {
+      return val.startsWith(prefixLower) && !/\s/.test(val);
+    }
+
+    function cancelPending() {
+      if (abortCtrl) abortCtrl.abort();
+      clearTimeout(debounceTimer);
+    }
+
+    async function querySuggest(raw) {
+      abortCtrl = new AbortController();
+      const res = await fetch("suggest?q=" + encodeURIComponent(raw), { signal: abortCtrl.signal });
+      if (!res.ok) throw new Error("/suggest: HTTP " + res.status);
+      const [, list, descs = []] = await res.json();
+      return { list, descs };
+    }
+
+    function showAllRows() {
+      rows.forEach(r => { r.hidden = false; r.style.order = ""; });
+      rowsToken = prefixLower;
+    }
+
+    function resetDrawer() {
+      cancelPending();
+      showAllRows();
+      if (autoOpened) {
+        drawer.open = false;
+        autoOpened = false;
+      }
+    }
+
+    function setActive(idx) {
+      activeIdx = idx;
+      Array.from(suggestionsEl.children).forEach((el, i) => {
+        el.classList.toggle("active", i === idx);
+        el.setAttribute("aria-selected", String(i === idx));
+      });
+      if (idx === -1) q.removeAttribute("aria-activedescendant");
+      else q.setAttribute("aria-activedescendant", suggestionsEl.children[idx].id);
+    }
+
+    function setExpanded(open) {
+      suggestionsEl.hidden = !open;
+      q.setAttribute("aria-expanded", String(open));
+    }
+
+    function hideSuggestions() {
+      cancelPending();
+      setExpanded(false);
+      suggestionsEl.replaceChildren();
+      setActive(-1);
+    }
+
+    function renderSuggestions(items) {
+      suggestionsEl.replaceChildren();
+      setActive(-1);
+      if (!items.length) {
+        setExpanded(false);
+        return;
+      }
+      items.slice(0, 8).forEach(({ text, desc }, i) => {
+        const div = document.createElement("div");
+        div.className = "row";
+        div.id = "suggestion-" + i;
+        div.setAttribute("role", "option");
+        div.setAttribute("aria-selected", "false");
+        div.dataset.value = text;
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "name";
+        nameSpan.textContent = text;
+        if (desc) {
+          const descSpan = document.createElement("span");
+          descSpan.className = "desc";
+          descSpan.textContent = desc;
+          nameSpan.appendChild(descSpan);
+        }
+        div.appendChild(nameSpan);
+        div.addEventListener("click", () => {
+          q.value = text;
+          hideSuggestions();
+          form.submit();
+        });
+        suggestionsEl.appendChild(div);
+      });
+      setExpanded(true);
+    }
+
+    function fetchSuggestions(raw) {
+      const lowerRaw = raw.trimEnd().toLowerCase();
+      if (isShortcutToken(lowerRaw) || (!lowerRaw.startsWith(prefixLower) && !plainSuggest)) {
+        hideSuggestions();
+        return;
+      }
+
+      const typedValue = q.value;
+      cancelPending();
+      debounceTimer = setTimeout(async () => {
+        try {
+          const { list, descs } = await querySuggest(raw);
+          const filtered = list
+            .map((s, i) => ({ text: s, desc: descs[i] || "" }))
+            .filter(item => item.text.toLowerCase() !== lowerRaw);
+          savedQuery = typedValue;
+          renderSuggestions(filtered);
+        } catch (err) {
+          if (err.name === "AbortError") return;
+          hideSuggestions();
+          reportError(err);
+        }
+      }, 80);
+    }
+
+    async function filterDrawer(raw) {
+      cancelPending();
+      try {
+        const { list } = await querySuggest(raw);
+        const ranks = new Map(
+          list.map((entry, idx) => [entry.slice(prefix.length).toLowerCase(), idx + 1])
+        );
+        rows.forEach(r => {
+          const rank = ranks.get(r.dataset.key.toLowerCase());
+          r.hidden = !rank;
+          r.style.order = rank ? String(rank) : "";
+        });
+        rowsToken = raw.toLowerCase();
+      } catch (err) {
+        if (err.name !== "AbortError") reportError(err);
+      }
+    }
+
+    function completeShortcut() {
+      if (rowsToken !== q.value.trimStart().toLowerCase()) return false;
+      const visible = rows.filter(r => !r.hidden).sort((a, b) => Number(a.style.order) - Number(b.style.order));
+      if (!visible.length) return false;
+      q.value = prefix + visible[0].dataset.key + " ";
+      resetDrawer();
+      return true;
+    }
+
+    function onInput() {
+      const raw = q.value.trimStart();
+      const val = raw.toLowerCase();
+
+      if (!val) {
+        hideSuggestions();
+        resetDrawer();
+        return;
+      }
+
+      if (!isShortcutToken(val)) {
+        resetDrawer();
+        fetchSuggestions(raw);
+        return;
+      }
+
+      hideSuggestions();
+      if (!drawer.open) {
+        drawer.open = true;
+        autoOpened = true;
+      }
+      if (val === prefixLower) {
+        showAllRows();
+        return;
+      }
+
+      const filter = filterDrawer(raw).finally(() => {
+        if (pendingFilter === filter) pendingFilter = null;
+      });
+      pendingFilter = filter;
+    }
+
+    q.addEventListener("input", onInput);
+
+    q.addEventListener("keydown", e => {
+      if (!suggestionsEl.hidden) {
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+          e.preventDefault();
+          const n = suggestionsEl.children.length;
+          if (e.key === "ArrowDown") setActive(activeIdx < n - 1 ? activeIdx + 1 : -1);
+          else setActive(activeIdx > -1 ? activeIdx - 1 : n - 1);
+          q.value = activeIdx === -1 ? savedQuery : suggestionsEl.children[activeIdx].dataset.value;
+          return;
+        }
+        if (e.key === "Escape") {
+          e.preventDefault();
+          q.value = savedQuery;
+          hideSuggestions();
+          return;
+        }
+      }
+      if (e.key === "Tab" && !e.shiftKey && isShortcutToken(q.value.trimStart().toLowerCase())) {
+        if (pendingFilter) {
+          e.preventDefault();
+          const typed = q.value;
+          pendingFilter.then(() => {
+            if (q.value !== typed || document.activeElement !== q || pendingFilter) return;
+            if (!completeShortcut()) form.querySelector("button").focus();
+          });
+        } else if (completeShortcut()) {
+          e.preventDefault();
+        }
+      }
+    });
+
+    document.addEventListener("click", e => {
+      if (!e.target.closest("#form") && !e.target.closest("#suggestions")) {
+        hideSuggestions();
+      }
+    });
+
+    rows.forEach(r => {
+      r.addEventListener("click", e => {
+        if (e.target.closest("a")) return;
+        q.value = prefix + r.dataset.key + " ";
+        q.focus();
+        resetDrawer();
+      });
+    });
+  </script>
+</body>
+</html>

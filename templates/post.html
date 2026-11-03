@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+</head>
+<body>
+  <form id="post-form" action="{{ .Action }}" method="post">
+    {{- range .Params }}
+    <input type="hidden" name="{{ .Key }}" value="{{ .Value }}">
+    {{- end }}
+    <noscript>
+      <button type="submit">Continue to search</button>
+    </noscript>
+  </form>
+  <script>document.getElementById("post-form").submit();</script>
+</body>
+</html>

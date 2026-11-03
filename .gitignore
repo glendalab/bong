@@ -1,0 +1,4 @@
+/bong
+config.yaml
+*.local.yaml
+.DS_Store

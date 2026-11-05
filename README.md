@@ -34,7 +34,7 @@ Flags override env vars, which override the config file.
 ```yaml
 default: g                                  # bong for queries without a shortcut
 suggest_url: "https://suggestqueries.google.com/complete/search?client=firefox&q=%s"
-include: [kr.yaml]                          # files with only include and bongs, relative to this one
+include: [bongs/base.yaml]                  # files with only include and bongs, relative to this one
 bongs:
   g: "https://www.google.com/search?q=%s"    # search_url only
   gh:
@@ -57,7 +57,7 @@ Placeholders:
 Suggestions:
 
 - `.gh foo`: the `suggest_url` of `gh`, else the top-level one
-- `foo`: the top-level `suggest_url` only, none without it or without a default bong
+- `foo`: the top-level `suggest_url` only, none without it
 
 POST, sent to `search_url`:
 
@@ -65,6 +65,10 @@ POST, sent to `search_url`:
 - `post_params: {q: "%s", hl: "{language}"}`: several fields
 - `post: true`: the query parameters of `search_url`, moved out of the URL
 
-Includes: later includes override earlier ones, and the including file overrides both. Overlay rules are in `config.example.yaml`.
+Includes: later includes override earlier ones, and the including file overrides both. Overlay rules are in `config.example.yaml`. Shortcut packs are in [bongs](https://github.com/glendalab/bongs).
 
-Typing a partial shortcut matches exact keys and aliases first, then key or alias prefixes, words in the title, keywords or host, and substrings, falling back to typos if nothing else matches. Hangul initials and partial syllables also work, and Tab completes the first match.
+Typing a partial shortcut matches exact keys and aliases first, then key or alias prefixes, words in the title, keywords or host, and substrings, falling back to typos if nothing else matches. Tab completes the first match.
+
+## L10n
+
+Shortcut completion also matches Hangul initials and partial syllables.

@@ -363,8 +363,10 @@ func TestServerHandlers(t *testing.T) {
 		t.Errorf("GET / status = %d, want 200", rec.Code)
 	}
 	if body := rec.Body.String(); !strings.Contains(body, "<title>Test &amp; &lt;Bong&gt;</title>") ||
-		!strings.Contains(body, `const prefix = ".";`) {
-		t.Errorf("index missing escaped title or prefix:\n%s", body)
+		!strings.Contains(body, `const prefix = ".";`) ||
+		!strings.Contains(body, `>.g</code>`) ||
+		strings.Contains(body, `>.goog<`) {
+		t.Errorf("unexpected index HTML:\n%s", body)
 	}
 
 	req = httptest.NewRequest(http.MethodGet, "/s?q=.r+golang", nil)

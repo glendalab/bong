@@ -41,7 +41,6 @@ type Server struct {
 
 type bongItem struct {
 	Key     string
-	Aliases []string
 	Title   string
 	MainURL string
 	Host    string
@@ -78,7 +77,6 @@ func buildBongItems(cfg *Config) []bongItem {
 		b := cfg.Bongs[k]
 		items = append(items, bongItem{
 			Key:     k,
-			Aliases: b.Aliases,
 			Title:   b.Title,
 			MainURL: b.MainURL,
 			Host:    strings.TrimPrefix(b.host, "www."),

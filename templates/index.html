@@ -140,12 +140,8 @@
       outline-offset: 2px;
       border-radius: 3px;
     }
-    .keys {
-      display: flex;
-      gap: 0.3rem;
-      flex-shrink: 0;
-    }
     code {
+      flex-shrink: 0;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-size: 0.8rem;
       padding: 0.12rem 0.38rem;
@@ -185,15 +181,10 @@
         {{- range .Items }}
         <div class="row" data-key="{{ .Key }}">
           <span class="name">
-            <button type="button" class="pick" aria-describedby="keys-{{ .Key }}">{{ .Title }}</button>
+            <button type="button" class="pick" aria-describedby="key-{{ .Key }}">{{ .Title }}</button>
             <a class="host" href="{{ .MainURL }}">{{ .Host }}</a>
           </span>
-          <span class="keys" id="keys-{{ .Key }}">
-            <code>{{ $prefix }}{{ .Key }}</code>
-            {{- range .Aliases }}
-            <code>{{ $prefix }}{{ . }}</code>
-            {{- end }}
-          </span>
+          <code id="key-{{ .Key }}">{{ $prefix }}{{ .Key }}</code>
         </div>
         {{- end }}
       </div>
